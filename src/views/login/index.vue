@@ -74,7 +74,7 @@ export default {
           data: { data: token }
         } = await login(this.mobile, this.code)
         this.$store.commit('SET_TOKEN', token)
-        this.$router.push('/profile')
+        this.$router.push('/my')
         this.$toast.success('登录成功')
       } catch (error) {
         const status = error.response.status
