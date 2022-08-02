@@ -45,7 +45,6 @@
     </van-form>
   </div>
 </template>
-
 <script>
 import { codeRules, mobileRules } from '../rules'
 import { login, getCodeAPI } from '@/api/user'
