@@ -10,27 +10,55 @@
       <van-tab v-for="item in myChannels" :key="item.id" :title="item.name"
         ><article-list :id="item.id"></article-list>
       </van-tab>
-      <span class="toutiao toutiao-gengduo1"></span>
+      <span class="toutiao toutiao-gengduo1" @click="show = true"></span>
     </van-tabs>
+    <van-popup
+      v-model="show"
+      position="bottom"
+      :style="{ height: '100%' }"
+      closeable
+      close-icon-position="top-left"
+    >
+      <ChanneIPopup
+        :myChannels="myChannels"
+        @close="show = false"
+        @change-active="active = $event"
+        @del-channel="delChannel"
+        @add-channel="addChannel"
+      ></ChanneIPopup>
+    </van-popup>
   </div>
 </template>
 
 <script>
-import { getMyChannel as getMyChannelAPI } from '@/api'
+import {
+  getMyChannel as getMyChannelAPI,
+  delChannel,
+  getMyChannel
+} from '@/api'
 import ArticleList from './components/ArticleList.vue'
+import ChanneIPopup from './components/ChanneIPopup.vue'
+import { addChannel, setMyChannelsToLocal, getMyChannelsByLocal } from '@/api'
 export default {
   name: 'Home',
   components: {
-    ArticleList
+    ArticleList,
+    ChanneIPopup
   },
   data() {
     return {
       active: 0,
-      myChannels: []
+      myChannels: [],
+      show: false
+    }
+  },
+  computed: {
+    isLogin() {
+      return !!this.$store.state.tokenObj.token
     }
   },
   created() {
-    this.getMyChannel()
+    this.initMyChannels()
   },
   methods: {
     async getMyChannel() {
@@ -38,7 +66,51 @@ export default {
         const { data } = await getMyChannelAPI()
         this.myChannels = data.data.channels
       } catch (error) {
+        console.log(error)
         this.$toast.fail('获取频道失败，请刷新')
+      }
+    },
+    initMyChannels() {
+      if (this.isLogin) {
+        this.getMyChannel()
+      } else {
+        const myChannels = getMyChannelsByLocal()
+        if (myChannels) {
+          this.myChannels = myChannels
+        } else {
+          this.getMyChannel()
+        }
+      }
+    },
+    async delChannel(id) {
+      this.$toast.loading({
+        message: '正在删除频道中...',
+        forbidClick: true
+      })
+      try {
+        const newChannel = this.myChannels.filter((item) => item.id !== id)
+        if (this.isLogin) {
+          await delChannel(id)
+        } else {
+          setMyChannelsToLocal(newChannel)
+        }
+        this.myChannels = newChannel
+        this.$toast.success('删除频道成功')
+      } catch (error) {
+        this.$toast.fail('删除频道失败请稍后再试~')
+      }
+    },
+    async addChannel(channel) {
+      try {
+        if (this.isLogin) {
+          await addChannel(channel.id, this.myChannels.length)
+        } else {
+          setMyChannelsToLocal([...this.myChannels, channel])
+        }
+        this.myChannels.push(channel)
+        this.$toast.success('添加频道成功')
+      } catch (error) {
+        this.$toast.fail('添加频道失败请稍后再试~')
       }
     }
   }
@@ -147,6 +219,7 @@ export default {
   text-align: center;
   opacity: 0.6;
   border-bottom: 1px solid #eee;
+  z-index: 999;
 
   position: fixed;
   top: 92px;
