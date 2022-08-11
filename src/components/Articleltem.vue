@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import dayjs from 'dayjs'
 export default {
   props: {
     articleInfo: {
@@ -47,7 +48,8 @@ export default {
   computed: {
     label() {
       const aut = this.articleInfo
-      return `${aut.aut_name} ${aut.comm_count}评论 ${aut.pubdate}`
+      const daty = dayjs().to(dayjs(aut.pubdate))
+      return `${aut.aut_name} ${aut.comm_count}评论 ${daty}`
     }
   }
 }

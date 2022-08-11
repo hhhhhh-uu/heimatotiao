@@ -32,7 +32,9 @@
             :src="article.aut_photo"
           />
           <div slot="title" class="user-name">{{ article.aut_name }}</div>
-          <div slot="label" class="publish-date">{{ article.pubdate }}</div>
+          <div slot="label" class="publish-date">
+            {{ article.pubdate | relativeTime }}
+          </div>
           <!-- <van-button
             v-if="article.is_followed"
             class="follow-btn"
