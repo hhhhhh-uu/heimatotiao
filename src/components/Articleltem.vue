@@ -4,6 +4,7 @@
     v-if="articleInfo.cover.type === 0"
     :title="articleInfo.title"
     :label="label"
+    :to="`/article/${articleInfo.art_id}`"
   />
 
   <!-- 一张图片的结构 -->
@@ -12,12 +13,19 @@
     :title="articleInfo.title"
     value="内容"
     :label="label"
+    :to="`/article/${articleInfo.art_id}`"
   >
     <van-image width="100" height="100" :src="articleInfo.cover.images[0]" />
   </van-cell>
 
   <!-- 三张图片的结构 -->
-  <van-cell v-else :title="articleInfo.title" value="内容" :label="label">
+  <van-cell
+    v-else
+    :title="articleInfo.title"
+    value="内容"
+    :label="label"
+    :to="`/article/${articleInfo.art_id}`"
+  >
     <van-image
       v-for="(item, index) in articleInfo.cover.images"
       :key="index"

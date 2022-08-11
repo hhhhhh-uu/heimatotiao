@@ -16,6 +16,19 @@
         @change="selectPhoto"
       />
     </van-cell>
+    <van-cell title="昵称" :value="userInfo.name" is-link @click="butPetName" />
+    <van-cell
+      title="性别"
+      :value="userInfo.gender === 0 ? '男' : '女'"
+      is-link
+      @click="butGender"
+    />
+    <van-cell
+      title="生日"
+      :value="userInfo.birthday"
+      is-link
+      @click="butBirthday"
+    />
     <van-popup
       class="avator-popup"
       v-model="isShowAvator"
@@ -25,8 +38,37 @@
         :photo="photo"
         @update-avator="userInfo.photo = $event"
         v-if="isShowAvator"
-      ></Update-avator
-    ></van-popup>
+      ></Update-avator>
+    </van-popup>
+    <van-popup
+      v-model="isPetName"
+      position="bottom"
+      :style="{ height: '100%' }"
+    >
+      <PetNames
+        v-if="isPetName"
+        @close="isPetName = false"
+        v-model="userInfo.name"
+      ></PetNames>
+    </van-popup>
+    <van-popup v-model="isGender" position="bottom" :style="{ height: '45%' }">
+      <Gender
+        v-if="isGender"
+        @close="isGender = false"
+        v-model="userInfo.gender"
+      ></Gender>
+    </van-popup>
+    <van-popup
+      v-model="isBirthday"
+      position="bottom"
+      :style="{ height: '45%' }"
+    >
+      <Birthday
+        v-if="isBirthday"
+        @close="isBirthday = false"
+        v-model="userInfo.birthday"
+      ></Birthday>
+    </van-popup>
   </div>
 </template>
 
@@ -34,17 +76,26 @@
 import { getUserInfo } from '@/api'
 import UpdateAvator from './components/UpdateAvator.vue'
 import { resolveToBase64 } from '@/utils'
+import PetNames from './components/PetName.vue'
+import Gender from './components/Gender.vue'
+import Birthday from './components/Birthday.vue'
 export default {
   name: 'User',
   data() {
     return {
       userInfo: {},
       isShowAvator: false,
-      photo: ''
+      photo: '',
+      isPetName: false,
+      isGender: false,
+      isBirthday: false
     }
   },
   components: {
-    UpdateAvator
+    UpdateAvator,
+    PetNames,
+    Gender,
+    Birthday
   },
   created() {
     this.getUserInfo()
@@ -54,7 +105,7 @@ export default {
       try {
         const { data } = await getUserInfo()
         this.userInfo = data.data
-        //   console.log(data)
+        console.log(data)
       } catch (error) {
         this.$toast.fail('获取用户信息失败,请刷新~')
       }
@@ -72,6 +123,15 @@ export default {
       this.photo = url
       e.target.value = ''
       this.isShowAvator = true
+    },
+    butPetName() {
+      this.isPetName = true
+    },
+    butGender() {
+      this.isGender = true
+    },
+    butBirthday() {
+      this.isBirthday = true
     }
   }
 }
@@ -81,7 +141,7 @@ export default {
 .navbar {
   background-color: #3296fa;
 }
-.van-nav-bar__title {
+.van-nav-bar__title.van-ellipsis {
   color: #fff;
 }
 .van-icon {

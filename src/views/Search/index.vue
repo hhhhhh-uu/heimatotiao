@@ -15,7 +15,13 @@
     <!-- <search-suggestion></search-suggestion>
     <search-result></search-result>
     <search-history></search-history> -->
-    <component :is="componentName" :keyword="keyword"></component>
+    <component
+      :is="componentName"
+      :keyword="keyword"
+      :SearchHistorys="SearchHistorys"
+      @clear-search-history="SearchHistorys = []"
+      @search="onSearch"
+    ></component>
   </div>
 </template>
 
@@ -23,18 +29,26 @@
 import SearchHistory from './components/SearchHistory.vue'
 import SearchResult from './components/SearchResult.vue'
 import SearchSuggestion from './components/SearchSuggestion.vue'
+import { setHEIMA, getHEIMA } from '@/utils/auth'
 export default {
   name: 'Search',
   data() {
     return {
       keyword: '',
-      isShowSearchResult: false
+      isShowSearchResult: false,
+      SearchHistorys: getHEIMA() || []
     }
   },
   components: {
     SearchHistory,
     SearchResult,
     SearchSuggestion
+  },
+  watch: {
+    SearchHistorys(value) {
+      setHEIMA(value)
+      // console.log('11')
+    }
   },
   computed: {
     componentName() {
@@ -48,8 +62,14 @@ export default {
     }
   },
   methods: {
-    onSearch() {
-      console.log('搜索了')
+    onSearch(val) {
+      // console.log('搜索了')
+      this.keyword = val
+      const index = this.SearchHistorys.indexOf(val)
+      if (index !== -1) {
+        this.SearchHistorys.splice(index, 1)
+      }
+      this.SearchHistorys.unshift(val)
       this.isShowSearchResult = true
     },
     onSearchFocus() {

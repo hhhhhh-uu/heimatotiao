@@ -3,6 +3,7 @@
     <van-cell
       v-for="(item, index) in highlightSuggestions"
       :key="index"
+      @click="$emit('search', suggestions[index])"
       icon="search"
     >
       <template #title>
